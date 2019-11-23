@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">KanFanBa</string>
+    <string name="app_name">看番吧！</string>
+
+    <string name="search">搜索</string>
+
+    <string name="about">关于</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="tag">恋爱后宫</string>
+
+
 </resources>

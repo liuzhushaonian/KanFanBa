@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_unlock"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:scaleType="center"
+        android:id="@+id/lock_1"
+        android:visibility="gone"
+        />
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_unlock"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="16dp"
+        android:scaleType="center"
+        android:id="@+id/lock_2"
+        android:visibility="gone"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorB"
+        android:id="@+id/con_header"
+        >
+
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_back"
+            android:id="@+id/con_back"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:id="@+id/vv_title"
+            android:textColor="@color/colorWhite"
+            />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_crop_free_black_24dp"
+            android:id="@+id/zoom"
+            />
+
+
+    </FrameLayout>
+
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="@color/colorB"
+        android:id="@+id/con_foot"
+        >
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            >
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_play_arrow_black_24dp"
+                android:id="@+id/exo_play"
+                />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_pause_black_24dp"
+                android:id="@+id/exo_pause"
+                />
+
+        </FrameLayout>
+
+
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_skip_next_black_24dp"
+            android:id="@+id/exo_next"
+            android:layout_marginStart="16dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:layout_marginStart="8dp"
+            android:id="@+id/exo_position"
+            android:textColor="@color/colorWhite"
+            />
+
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:id="@+id/exo_progress"
+
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:layout_marginStart="8dp"
+            android:id="@+id/exo_duration"
+            android:textColor="@color/colorWhite"
+            />
+
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
+</FrameLayout>
