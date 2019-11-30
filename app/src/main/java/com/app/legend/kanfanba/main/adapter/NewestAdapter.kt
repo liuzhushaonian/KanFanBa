@@ -101,7 +101,7 @@ class NewestAdapter :BaseAdapter<NewestAdapter.ViewHolder>(){
 
             val width=itemView.resources.displayMetrics.widthPixels
 
-            val w=(width/2)-sapce
+            val w=((width-sapce)/2).toInt()
 
             val h=(w*1.333333).toInt()
 

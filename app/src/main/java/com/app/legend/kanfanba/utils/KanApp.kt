@@ -3,6 +3,7 @@ package com.app.legend.kanfanba.utils
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import com.sunchen.netbus.NetStatusBus
 import java.security.SecureRandom
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
@@ -20,6 +21,8 @@ class KanApp: Application() {
         super.onCreate()
 
         context=applicationContext
+        NetStatusBus.getInstance().init(this);
+
 
         trustAllHosts()
 

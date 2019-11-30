@@ -18,8 +18,11 @@ import com.app.legend.kanfanba.main.adapter.NewestAdapter
 import com.app.legend.kanfanba.main.presenter.INewestFragment
 import com.app.legend.kanfanba.main.presenter.NewestFragmentPresenter
 import com.app.legend.kanfanba.play.activity.PlayActivity
+import com.app.legend.kanfanba.utils.CourseSearchAdapterWrapper
+import com.app.legend.ruminasu.adapters.BaseAdapter
 import com.app.legend.ruminasu.fragments.BasePresenterFragment
 import com.app.legend.ruminasu.utils.MainItemSpace
+import com.github.ybq.android.spinkit.SpinKitView
 import kotlinx.android.synthetic.main.fragment_main_newest.*
 
 /**
@@ -41,8 +44,14 @@ class NewestFragment : BasePresenterFragment<INewestFragment,NewestFragmentPrese
 
     private var refresh=false
 
+    private lateinit var spin_kit:SpinKitView
+
+    var courseSearchAdapterWrapper:CourseSearchAdapterWrapper?=null
+
 
     override fun setData(list: MutableList<Video>) {
+
+        spin_kit.visibility=View.GONE
 
 
 
@@ -56,6 +65,9 @@ class NewestFragment : BasePresenterFragment<INewestFragment,NewestFragmentPrese
                 refresh=false
                 new_swipe.isRefreshing=refresh
 
+//                courseSearchAdapterWrapper?.notifyDataSetChanged()
+
+
             }
 
             adapter.addVideos(list)
@@ -66,13 +78,21 @@ class NewestFragment : BasePresenterFragment<INewestFragment,NewestFragmentPrese
 
             bottom=false
 
+            courseSearchAdapterWrapper?.notifyDataSetChanged()
+
 
 
         }else{//获得的列表是空的
 
             bottom=true
 
+            courseSearchAdapterWrapper?.noMoreData()
+
         }
+    }
+
+    override fun onError(msg: String) {
+        Toast.makeText(context,"获取内容出错，错误原因：$msg",Toast.LENGTH_LONG).show()
     }
 
 
@@ -101,6 +121,7 @@ class NewestFragment : BasePresenterFragment<INewestFragment,NewestFragmentPrese
 
         new_list=view.findViewById(R.id.new_list)
         new_swipe=view.findViewById(R.id.new_swipe)
+        spin_kit=view.findViewById(R.id.spin_kit)
 
     }
 
@@ -108,14 +129,15 @@ class NewestFragment : BasePresenterFragment<INewestFragment,NewestFragmentPrese
     private fun initList(){
 
         val gridLayoutManager =GridLayoutManager(context,2)
-        new_list.adapter=adapter
+//        new_list.adapter=adapter
         new_list.layoutManager=gridLayoutManager
         new_list.addItemDecoration(MainItemSpace())
 
-        new_list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+        courseSearchAdapterWrapper=CourseSearchAdapterWrapper(context!!,adapter as BaseAdapter<RecyclerView.ViewHolder>,24,new_list)
+
+        courseSearchAdapterWrapper?.setOnLoadMoreListener(object :CourseSearchAdapterWrapper.OnLoadMoreListener{
+            override fun onLoadMore() {
 
                 if (!new_list.canScrollVertically(1)){//到底部
 
@@ -134,9 +156,12 @@ class NewestFragment : BasePresenterFragment<INewestFragment,NewestFragmentPrese
 
                 }
 
-
             }
+
+
         })
+
+        new_list.adapter=courseSearchAdapterWrapper
 
 
         adapter.onNewestItemClick=object :OnNewestItemClick{

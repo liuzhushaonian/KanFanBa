@@ -22,7 +22,7 @@ class MainItemSpace: RecyclerView.ItemDecoration() {
 
         if (position%2==0){
 
-            outRect.left = space*2
+            outRect.left = space
 
         }
 

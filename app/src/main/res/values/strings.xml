@@ -1,14 +1,39 @@
 <resources>
-    <string name="app_name">看番吧！</string>
+    <string name="app_name">看番吧</string>
 
     <string name="search">搜索</string>
+    <string name="about_app">关于本APP</string>
 
-    <string name="about">关于</string>
+    <string name="about">关于看番吧！</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="tag">恋爱后宫</string>
 
+    <string name="eps">剧集列表</string>
+    <string name="vid">单个视频</string>
+    <string name="no_search">啊啦？居然没搜索到任何内容！</string>
+
+    <string name="about_app_content">
+
+        本APP与看番吧没有任何直接关系，纯属于个人兴趣爱好而衍生，内容全是通过爬虫获取，本人没有存储任何内容。
+        感谢看番吧！希望看番能给予更多人乐趣与勇气。
+        当前版本为群内测试版，请勿外传。
+
+    </string>
+
+    <string name="thanks">
+
+        恭喜找到彩蛋。\n
+        也感谢找到彩蛋，毕竟很少有心人会来到这里。\n
+        我也不知为何，官方的\"关于我们\"，也是这样的。\n
+        但我墙裂推荐好好看看，甚至是收藏本视频。\n
+        如果它给予了你勇气或是乐趣，那么欢迎有空再来。\n
+        最后感谢看番吧！\n
+
+    </string>
+
+    <string name="play_list">播放列表</string>
 
 </resources>

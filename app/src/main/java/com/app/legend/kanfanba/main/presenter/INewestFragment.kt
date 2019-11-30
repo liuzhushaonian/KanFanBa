@@ -6,4 +6,6 @@ interface INewestFragment {
 
     fun setData(list: MutableList<Video>)
 
+    fun onError(msg:String)
+
 }

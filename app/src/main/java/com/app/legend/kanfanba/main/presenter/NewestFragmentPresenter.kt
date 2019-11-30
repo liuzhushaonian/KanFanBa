@@ -27,7 +27,6 @@ class NewestFragmentPresenter(fragment: INewestFragment):BasePresenter<INewestFr
 
     public fun getData(page: Int){
 
-
         getHtml(page)
 
     }
@@ -42,48 +41,35 @@ class NewestFragmentPresenter(fragment: INewestFragment):BasePresenter<INewestFr
 
             val html=NetWorkUtil.getHtml(Conf.URL,buildForm(page))
 
-//            Log.d("html---->>>",html)
+            if (html.code!=200){
 
-//            val file= File(context.getExternalFilesDir(null),"sou.html")
-//
-//            file.writeText(html!!)
+                it.onError(Throwable("msg--->>${html.code}"))
 
-            val list=HtmlUtil.getNewestList(html!!)
+            }else {
 
-//            Log.d("list---->>>","${list.size}")
+                val list = HtmlUtil.getNewestList(html.info)
 
-            it.onNext(list)
+                it.onNext(list)
+            }
 
             it.onComplete()
-
 
         }).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
 
                 onNext = {
-
-
                     fragment.setData(it)
 
                 },
 
-                onComplete = {
+                onError = {
 
-
+                    fragment.onError(it.message!!)
 
                 }
-
-
-
-
             )
-
     }
-
-
-
-
 
     private fun buildForm(page:Int):FormBody{
 
@@ -104,10 +90,6 @@ class NewestFragmentPresenter(fragment: INewestFragment):BasePresenter<INewestFr
             .add("params[display_categories]","yes")
             .add("params[layout]","grid-sm-fw-col")
             .build()
-
     }
-
-
-
 
 }

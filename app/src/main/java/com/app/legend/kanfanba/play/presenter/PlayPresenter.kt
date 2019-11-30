@@ -34,11 +34,19 @@ class PlayPresenter(activity: IPlayActivity) : BasePresenter<IPlayActivity>() {
 
         Observable.create(ObservableOnSubscribe<String> {
 
-            val json=NetWorkUtil.getHtml("https://akcp.kanfanba.com/wp-admin/admin-ajax.php",buildBody(v.post_id,security))
+            val result=NetWorkUtil.getHtml("https://akcp.kanfanba.com/wp-admin/admin-ajax.php",buildBody(v.post_id,security))
 
-            val url=HtmlUtil.parseVideoJson(json!!)
+            if (result.code!=200){
 
-            it.onNext(url)
+                it.onError(Throwable("msg--->>${result.code}"))
+
+            }else {
+
+
+                val url = HtmlUtil.parseVideoJson(result.info)
+
+                it.onNext(url)
+            }
             it.onComplete()
 
 

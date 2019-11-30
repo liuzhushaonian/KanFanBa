@@ -113,7 +113,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_skip_next_black_24dp"
-            android:id="@+id/exo_next"
+            android:id="@+id/play_next"
             android:layout_marginStart="16dp"
             />
 

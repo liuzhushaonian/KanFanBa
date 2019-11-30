@@ -6,4 +6,6 @@ interface IEpisodeFragment {
 
     fun setData(list: MutableList<Episode>)
 
+    fun onError(msg:String)
+
 }

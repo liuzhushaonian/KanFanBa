@@ -4,5 +4,7 @@ interface IMainActivity {
 
     fun setSecurityValue(security:String)
 
+    fun onError(msg:String)
+
 
 }

@@ -1,17 +1,29 @@
 package com.app.legend.kanfanba.main.activity
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import com.app.legend.kanfanba.R
+import com.app.legend.kanfanba.bean.Video
 import com.app.legend.kanfanba.main.adapter.MainPagerAdapter
 import com.app.legend.kanfanba.main.presenter.IMainActivity
 import com.app.legend.kanfanba.main.presenter.MainPresenter
-import com.app.legend.ruminasu.activityes.BaseActivity
+import com.app.legend.kanfanba.play.activity.PlayActivity
+import com.app.legend.kanfanba.search.activity.SearchActivity
 import com.app.legend.ruminasu.activityes.BasePresenterActivity
 import com.google.android.material.tabs.TabLayout
+import com.sunchen.netbus.NetStatusBus
+import com.sunchen.netbus.annotation.NetSubscribe
+import com.sunchen.netbus.type.Mode
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 /**
  * 首页展示，第一页展示番剧，第二页展示剧场版（viewpager）
@@ -33,7 +45,16 @@ class MainActivity : BasePresenterActivity<IMainActivity,MainPresenter>(),IMainA
         initPager()
 
 
+    }
 
+    override fun onStart() {
+        super.onStart()
+        NetStatusBus.getInstance().register(this);
+    }
+
+    override fun onStop() {
+        super.onStop()
+        NetStatusBus.getInstance().unregister(this);
     }
 
     /**
@@ -56,6 +77,8 @@ class MainActivity : BasePresenterActivity<IMainActivity,MainPresenter>(),IMainA
         val search=menu!!.findItem(R.id.menu_search)
 
         searchView=search.actionView as SearchView
+
+        initSearch()
 
         return true
     }
@@ -92,8 +115,40 @@ class MainActivity : BasePresenterActivity<IMainActivity,MainPresenter>(),IMainA
     private fun initSearch(){
 
 
+        searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                startSearch(query)
+
+                return true
+
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                return false
+            }
+
+
+        })
 
     }
+
+
+    private fun startSearch(query:String?){
+
+        if (query == null || query.isBlank()){
+
+            return
+        }
+
+        val intent=Intent(this,SearchActivity::class.java)
+        intent.putExtra("s",query)
+
+        startActivity(intent)
+
+    }
+
 
     override fun createPresenter(): MainPresenter {
         return MainPresenter(this)
@@ -103,7 +158,77 @@ class MainActivity : BasePresenterActivity<IMainActivity,MainPresenter>(),IMainA
         sharedPreferences!!.edit().putString("security",s).apply()
     }
 
+    override fun onError(msg: String) {
+        Toast.makeText(this,"获取内容出错，错误原因：$msg",Toast.LENGTH_LONG).show()
+    }
+
+    private var currentBackPressedTime: Long = 0
+    // 退出间隔
+    private val BACK_PRESSED_INTERVAL = 2000
+
+    override fun onBackPressed() {
+//        super.onBackPressed()
+
+        if (System.currentTimeMillis() - currentBackPressedTime > BACK_PRESSED_INTERVAL) {
+            currentBackPressedTime = System.currentTimeMillis();
+            Toast.makeText(this, "再按一次返回键退出程序", Toast.LENGTH_SHORT).show();
+        } else {
+            // 退出
+            super.onBackPressed();
+        }
+
+    }
+    @NetSubscribe(mode = Mode.MOBILE_CONNECT)
+    public fun netChange(){
+
+//        Log.d("net--->>>","连接到移动网络")
+
+        showDialog()
+
+    }
+
+    private fun showDialog(){
+
+        val dialog=AlertDialog.Builder(this).setTitle("警告").setMessage("目前正在使用移动网络，这可能会消耗您的流量，产生流量费用，一切以您运营商套餐内容为准。本APP不会以任何形式扣费。").setNegativeButton("确定") { dialog, which ->
+
+            dialog.dismiss()
+
+        }.show()
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when(item.itemId){
+
+            R.id.about->{
+                startAbout()
+            }
+
+            R.id.about_app->{
+
+                val dialog=AlertDialog.Builder(this).setTitle("警告").setMessage(getString(R.string.about_app_content)).setNegativeButton("确定") { dialog, which ->
+
+                    dialog.dismiss()
+
+                }.show()
+            }
+        }
 
 
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun startAbout(){
+
+        val intent=Intent(this,PlayActivity::class.java)
+
+        val video=Video("关于看番吧","","","","","https://xiazailianjie.com/video_post/SOS_batch/index.m3u8",0,"",-1)
+
+        intent.putExtra("video",video)
+
+        startActivity(intent)
+
+    }
 
 }

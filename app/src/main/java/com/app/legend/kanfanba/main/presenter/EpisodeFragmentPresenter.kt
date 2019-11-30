@@ -35,9 +35,16 @@ class EpisodeFragmentPresenter(fragment:IEpisodeFragment):BasePresenter<IEpisode
 
             val html=NetWorkUtil.getHtml(Conf.URL,buildForm(page))
 
-            val list=HtmlUtil.getEpisodeList(html!!)
+            if (html.code!=200){
 
-            it.onNext(list)
+                it.onError(Throwable("msg--->>${html.code}"))
+
+            }else {
+
+                val list = HtmlUtil.getEpisodeList(html.info)
+
+                it.onNext(list)
+            }
 
             it.onComplete()
 
@@ -51,9 +58,9 @@ class EpisodeFragmentPresenter(fragment:IEpisodeFragment):BasePresenter<IEpisode
                     fragment.setData(it)
                 },
 
-                onComplete = {
+                onError = {
 
-
+                    fragment.onError(it.message!!)
 
                 }
 

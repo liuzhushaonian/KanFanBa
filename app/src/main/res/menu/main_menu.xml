@@ -12,6 +12,12 @@
         />
 
     <item
+        android:title="@string/about_app"
+        android:id="@+id/about_app"
+        app:showAsAction="never"
+        />
+
+    <item
         android:title="@string/about"
         android:id="@+id/about"
         app:showAsAction="never"

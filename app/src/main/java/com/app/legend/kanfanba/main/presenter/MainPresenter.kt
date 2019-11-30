@@ -32,17 +32,29 @@ class MainPresenter(activity: IMainActivity) :BasePresenter<IMainActivity>(){
 
             val index=NetWorkUtil.getIndex()
 
-            val s=HtmlUtil.parseIndex(index)
+            if (index.code!=200){
+                it.onError(Throwable("msg--->>${index.code}"))
+                it.onComplete()
+            }else {
 
-            it.onNext(s)
+                val s = HtmlUtil.parseIndex(index.info)
 
-            it.onComplete()
+                it.onNext(s)
+
+                it.onComplete()
+            }
 
         }).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(
                 onNext = {
                     activity.setSecurityValue(it)
+                },
+
+                onError = {
+
+                    activity.onError(it.message!!)
+
                 }
             )
     }

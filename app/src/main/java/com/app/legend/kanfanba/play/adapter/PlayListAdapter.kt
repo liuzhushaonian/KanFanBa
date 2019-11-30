@@ -1,5 +1,6 @@
 package com.app.legend.kanfanba.play.adapter
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,10 +60,23 @@ class PlayListAdapter: BaseAdapter<PlayListAdapter.ViewHolder>() {
 
         val v=playList[position]
 
+
         val t="${position+1} ${v.title}"
 
         holder.title.text=t
+
+        if (v.isPlay>0){
+
+
+
+        }else{
+
+
+        }
+
         Glide.with(holder.itemView).load(v.book).into(holder.itemView.item_book)
+
+
 
     }
 
@@ -71,5 +85,23 @@ class PlayListAdapter: BaseAdapter<PlayListAdapter.ViewHolder>() {
         val title:TextView=itemView.findViewById(R.id.v_title)
 
     }
+
+
+    public fun getNext(video: Video?):Video?{
+
+        val index=playList.indexOf(video)
+
+        if (playList.size-1>index){
+
+            val n=index+1
+
+            return playList[n]
+
+        }
+
+        return null
+
+    }
+
 
 }

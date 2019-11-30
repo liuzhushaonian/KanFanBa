@@ -39,15 +39,20 @@
             android:layout_marginTop="16dp"
             android:ellipsize="end"
             android:maxLines="5"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:layout_marginStart="16dp"
+            android:textColor="@color/colorBlack"
+            />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="播放列表"
+            android:text="@string/play_list"
             android:textColor="@color/colorAccent"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
+            android:id="@+id/list_title"
+            android:textSize="16sp"
             />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -61,8 +66,23 @@
 
         </androidx.recyclerview.widget.RecyclerView>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/thanks"
+            android:text="@string/thanks"
+            android:visibility="gone"
+            android:gravity="center|start"
+            android:textSize="18sp"
+            android:padding="16dp"
+            />
+
 
     </LinearLayout>
+
+
+
+
 
     <FrameLayout
         android:id="@+id/land_container"

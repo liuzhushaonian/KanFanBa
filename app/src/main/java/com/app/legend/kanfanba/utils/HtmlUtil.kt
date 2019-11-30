@@ -33,6 +33,7 @@ class HtmlUtil {
             for (article in articles){
 
                 var book=""
+                var big=""
 
                 //先获取图片
 
@@ -48,6 +49,13 @@ class HtmlUtil {
 
                     if (split.isNotEmpty()){
                         book=split[0]
+
+                        if (split.size>=2) {
+
+                            big = split[1]
+                        }
+
+                        big=big.substring(0,big.length-5)
 
                         book=book.substring(0,book.length-5)
 
@@ -78,7 +86,7 @@ class HtmlUtil {
 
                 //获取链接
 
-                var url=""
+//                var url=""
 
                 var title=""
 
@@ -93,7 +101,7 @@ class HtmlUtil {
 
                         val aa=a3.last()
 
-                        url=aa.attr("href")
+//                        url=aa.attr("href")
 
                         title=aa.text()
                     }
@@ -127,7 +135,7 @@ class HtmlUtil {
                 }
 
 
-                val video=Video(title,tag,"",time,book,url,id)
+                val video=Video(title,tag,"",time,book,"",id,big,-1)
 
                 list.add(video)
 
@@ -185,8 +193,6 @@ class HtmlUtil {
 
             }
 
-            Log.d("rr--->>",r)
-
             return r
 
         }
@@ -225,9 +231,51 @@ class HtmlUtil {
 
                 val imgs=a.getElementsByTag("img")
 
+                var big=""
+
                 if (imgs.isNotEmpty()){
 
                     book=imgs[0].attr("data-src")
+
+                    val bb=imgs[0].attr("data-srcset")
+
+                    val sl=bb.split(",")
+
+                    if (sl.isNotEmpty()){
+
+//                        val sl1=sl.reversed()
+
+                        if (sl.size>=2) {
+
+                            big = sl[1]
+                        }else{
+
+                            big=sl[0]
+                        }
+
+                        if (big.contains("jpg")){
+
+                            val b=big.indexOf("jpg")
+
+                            big= big.substring(0,b+3)
+
+//                            big=big.substring(0,big.lastIndexOf("-"))
+//                            big="$big.jpg"
+
+                        }else if (big.contains("png")){
+
+                            val b=big.indexOf("png")
+
+                            big=big.substring(0,b+3)
+
+//                            big=big.substring(0,big.lastIndexOf("-"))
+//                            big="$big.png"
+
+                        }
+
+                    }
+
+
 
                 }
 
@@ -241,7 +289,7 @@ class HtmlUtil {
 
                 }
 
-                val episode=Episode(title,date,0,"","",book,url)
+                val episode=Episode(title,date,0,"","",book,url,big)
 
                 list.add(episode)
 
@@ -253,6 +301,286 @@ class HtmlUtil {
 
         }
 
+        /**
+         * 获取一个剧集里的所有视频信息
+         */
+        public fun getEpisodeVideos(html: String):MutableList<Video>{
+
+            val videos:MutableList<Video> =ArrayList()
+
+            val document=Jsoup.parse(html)
+
+            val divs=document.getElementsByClass("blog-items")
+
+            if (divs.isNotEmpty()){
+
+                val articles=divs[0].getElementsByTag("article")
+
+                for (a in articles){
+
+                    //先获取封面
+
+                    var book=""
+
+                    var big=""
+
+                    val imgs=a.getElementsByTag("img")
+
+                    if (imgs.isNotEmpty()){
+
+                        book=imgs[0].attr("data-src")
+
+                        if (!book.startsWith("http")){
+                            book= "https:$book"
+
+//                            Log.d("http--->>",book)
+
+                        }
+
+                        val gg=imgs[0].attr("data-srcset")
+
+                        val pp=gg.split(",")
+
+                        if (pp.isNotEmpty()) {
+
+                            if (pp.size>=2) {
+
+                                big = pp[1]
+                            }else{
+
+                                big=pp[0]
+                            }
+
+
+
+                            if (big.contains("jpg")){
+
+                                val b=big.indexOf("jpg")
+                                big=big.substring(0,b+3)
+
+//                                big=big.substring(0,big.lastIndexOf("-"))
+//                                big="$big.jpg"
+
+
+                            }else if(big.contains("png")){
+
+                                val b=big.indexOf("png")
+                                big=big.substring(0,b+3)
+
+//                                big=big.substring(0,big.lastIndexOf("-"))
+//                                big="$big.png"
+                            }
+
+                            if (!big.startsWith("http")){
+
+                                big="https:$big"
+                            }
+
+
+
+                        }
+
+                    }
+
+                    //获取title
+
+                    var title=""
+
+                    var id=0
+
+                    val aa=a.getElementsByTag("a")
+
+                    if (aa.isNotEmpty()){
+
+                        title=aa[0].attr("title")
+                        id=aa[0].attr("data-post-id").toInt()
+
+                    }
+
+                    var time=""
+
+                    val tt=a.getElementsByTag("time")
+
+                    if (tt.isNotEmpty()){
+
+                        time=tt[0].text()
+
+                    }
+
+                    val v=Video(title,"","",time,book,"",id,big,-1)
+
+                    videos.add(v)
+                }
+            }
+
+            return videos
+        }
+
+
+
+        public fun getMovies(html: String):MutableList<Video>{
+
+            val movieList:MutableList<Video> =ArrayList()
+            val document=Jsoup.parse(html)
+
+            val articles=document.getElementsByTag("article")
+
+            for (a in articles){
+
+                var book=""
+                var big=""
+
+                var id=0
+
+                var title=""
+
+                val aa=a.getElementsByTag("a")
+
+                if (aa.isNotEmpty()){
+
+                    val sa=aa[0]
+
+                    id=sa.attr("data-post-id").toInt()
+                    title=sa.attr("title")
+
+
+                }
+
+                val imgs=a.getElementsByTag("img")
+                if (imgs.isNotEmpty()){
+
+                    val img=imgs[0]
+                    book=img.attr("data-src")
+                }
+
+                val v=Video(title,"","","",book,"",id,"",-1)
+
+                movieList.add(v)
+
+            }
+
+            return movieList
+
+
+        }
+
+
+        fun parseSearchVideo(html: String):MutableList<Video>{
+
+            val list:MutableList<Video> =ArrayList()
+
+            val document=Jsoup.parse(html)
+
+            val articles=document.getElementsByTag("article")
+
+            for (article in articles){
+
+                if (article.classNames().contains("category-117")){
+
+                    var id=0
+
+                    var title=""
+
+                    val aa=article.getElementsByTag("a")
+
+                    if (aa.isNotEmpty()){
+
+                        id=aa[0].attr("data-post-id").toInt()
+                        title=aa[0].attr("title")
+
+                    }
+
+                    var book=""
+
+                    val imgs=article.getElementsByTag("img")
+
+                    if (imgs.isNotEmpty()){
+
+                        book=imgs[0].attr("data-src")
+
+                    }
+
+                    var date=""
+
+                    val times=article.getElementsByTag("time")
+
+                    if (times.isNotEmpty()){
+
+                        date=times[0].text()
+
+                    }
+
+                    val v=Video(title,"","",date,book,"",id,book,-1)
+
+                    list.add(v)
+
+                }
+
+            }
+
+            return list
+
+        }
+
+
+        fun parseSearchEpisode(html: String):MutableList<Episode>{
+
+            val episodeList:MutableList<Episode> =ArrayList()
+
+            val d=Jsoup.parse(html)
+
+            val articles=d.getElementsByTag("article")
+
+            for (article in articles){
+
+                if (article.classNames().contains("type-vid_playlist")){
+
+                    var title=""
+                    var book=""
+                    var url=""
+                    var date=""
+
+                    val aa=article.getElementsByTag("a")
+
+                    if (aa.isNotEmpty()){
+
+                        title=aa[0].attr("title")
+
+                        if (aa.size>=2){
+
+                            url=aa[1].attr("href")
+
+                        }
+
+                    }
+
+
+                    val imgs=article.getElementsByTag("img")
+                    if (imgs.isNotEmpty()){
+
+                        book=imgs[0].attr("data-src")
+
+                    }
+
+                    val times=article.getElementsByTag("time")
+
+                    if (times.isNotEmpty()){
+
+                        date=times[0].text()
+
+                    }
+
+                    val e=Episode(title,date,0,"","",book,url,book)
+
+                    episodeList.add(e)
+
+                }
+
+            }
+
+            return episodeList
+
+        }
 
     }
 

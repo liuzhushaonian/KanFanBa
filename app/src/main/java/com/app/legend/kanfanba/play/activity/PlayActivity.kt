@@ -2,6 +2,7 @@ package com.app.legend.kanfanba.play.activity
 
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
@@ -11,6 +12,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.legend.kanfanba.R
 import com.app.legend.kanfanba.bean.Video
+import com.app.legend.kanfanba.m3u8.M3u8Downloader
 import com.app.legend.kanfanba.play.adapter.OnPlayListItemClick
 import com.app.legend.kanfanba.play.adapter.PlayListAdapter
 import com.app.legend.kanfanba.play.presenter.IPlayActivity
@@ -18,8 +20,11 @@ import com.app.legend.kanfanba.play.presenter.PlayPresenter
 import com.app.legend.ruminasu.activityes.BasePresenterActivity
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.hls.HlsDataSourceFactory
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.google.android.exoplayer2.util.Log
@@ -27,6 +32,10 @@ import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.activity_play.*
 import kotlinx.android.synthetic.main.exo_player_control_view.*
 import kotlinx.android.synthetic.main.exo_player_control_view.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPlayActivity {
@@ -35,10 +44,24 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
     lateinit var player: ExoPlayer
     private lateinit var lock1:ImageView
     private lateinit var lock2:ImageView
-
+    private lateinit var next:ImageView
     private var isLock=false
+    private var playingVideo: Video?=null
+    val adapter=PlayListAdapter()
+
+    private var isLand=false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+//        window.getDecorView().setSystemUiVisibility(
+//            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//        )
+//
+//        window.setFlags(WindowManager.LayoutParams. FLAG_FULLSCREEN , WindowManager.LayoutParams. FLAG_FULLSCREEN)
+        window.setStatusBarColor(Color.BLACK)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_play)
 
@@ -63,6 +86,8 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
 
         lock2=player_view.findViewById(R.id.lock_2)
 
+        next=player_view.findViewById(R.id.play_next)
+
 
         sp.setOnClickListener {
 
@@ -78,6 +103,10 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
              * @return
              */
             override fun onDoubleTap(e: MotionEvent): Boolean { //双击事件
+
+                if (isLock){
+                    return false
+                }
 
                 player.playWhenReady=!player.playWhenReady
 
@@ -108,12 +137,26 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
     private fun getVideo() {
 
         val v = intent.getParcelableExtra<Video>("video")
+        playingVideo=v
 
-        initVideoInfos(v)
-        initList(v)
+        if (v.url.isNotEmpty()){//播放关于看番吧
+
+            setSource(v.url)
+            video_title.text="关于看番吧"
+            thanks.visibility=View.VISIBLE
+            play_list.visibility=View.GONE
+            list_title.visibility=View.GONE
 
 
+        }else {
 
+            thanks.visibility=View.GONE
+            play_list.visibility=View.VISIBLE
+            list_title.visibility=View.VISIBLE
+
+            initVideoInfos(v)
+            initList(v)
+        }
     }
 
     override fun setSource(url: String) {
@@ -140,6 +183,18 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
             .createMediaSource(uri)
 
         player.prepare(hlsMediaSource)
+
+        player.playWhenReady=true
+
+//        val m3u8Downloader=M3u8Downloader()
+//
+//        GlobalScope.launch(Dispatchers.IO) {
+//            //IO 线程里拉取数据
+//
+//            m3u8Downloader.download(url)
+//
+//        }
+
 
 //        player.playWhenReady = true
 
@@ -178,6 +233,8 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
      */
     private fun enterFullScreen(){
 
+        isLand=true
+
         val container=player_view.parent as ViewGroup
         container.removeView(player_view)
 
@@ -196,6 +253,7 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
 
     private fun exitsFullScreen(){
 
+        isLand=false
         val container=player_view.parent as ViewGroup
         container.removeView(player_view)
 
@@ -229,6 +287,10 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
 
     private fun changeOrientation(){
 
+        if (isLock){
+            return
+        }
+
         if (requestedOrientation==ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){//横屏
 
 
@@ -244,18 +306,15 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
 
     override fun onBackPressed() {
 
-        if (requestedOrientation==ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
+        if (isLock){
 
-            if (isLock){
+            Toast.makeText(this,"请先解除锁定",Toast.LENGTH_LONG).show()
+            return
+        } else if (isLand){
 
-                Toast.makeText(this,"请先解除锁定",Toast.LENGTH_LONG).show()
+            changeOrientation()
 
-                return
-            }
-
-            exitsFullScreen()
-
-        }else {
+        }else{
 
             super.onBackPressed()
         }
@@ -294,13 +353,30 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
 
         player_view.con_back.setOnClickListener {
 
-            if (isLock){
+//            if (isLock){
+//
+//                Toast.makeText(this,"请先解除锁定",Toast.LENGTH_LONG).show()
+//
+//            }else {
+//                exitsFullScreen()
+//            }
 
-                Toast.makeText(this,"请先解除锁定",Toast.LENGTH_LONG).show()
+
+            if (isLand){//横屏
+
+                changeOrientation()
 
             }else {
-                exitsFullScreen()
+
+                finish()
+
             }
+
+        }
+
+        next.setOnClickListener {
+
+            next()
 
         }
 
@@ -377,6 +453,9 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
     }
 
 
+    /**
+     * 播放
+     */
     private fun initVideoInfos(v:Video){
 
         video_title.text=v.title
@@ -388,11 +467,14 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
 
     }
 
+    /**
+     * 初始化列表
+     */
     private fun initList(v:Video){
 
         var list=intent.getParcelableArrayListExtra<Video>("list")
 
-        val adapter=PlayListAdapter()
+
 
         val linearLayoutManager=LinearLayoutManager(this)
 
@@ -419,8 +501,29 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
 
     }
 
+    /**
+     * 下一集
+     */
+    private fun next(){
 
+        if (playingVideo==null){
 
+            return
 
+        }
+
+        val v=adapter.getNext(playingVideo)
+
+        if (v!=null){
+            playingVideo=v
+
+            initVideoInfos(playingVideo!!)
+
+        }else{
+
+            Toast.makeText(this,"已经是最后一集了",Toast.LENGTH_LONG).show()
+        }
+
+    }
 
 }
