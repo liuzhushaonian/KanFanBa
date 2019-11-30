@@ -429,6 +429,7 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
         super.onResume()
         if (player_view!=null) {
             player_view.onResume()
+            player.playWhenReady=true
         }
     }
 
@@ -437,6 +438,7 @@ class PlayActivity : BasePresenterActivity<IPlayActivity, PlayPresenter>(), IPla
         if (player_view!=null){
 
             player_view.onPause()
+            player.playWhenReady=false
 
         }
     }

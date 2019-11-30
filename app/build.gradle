@@ -6,6 +6,10 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
+static def releaseTime() {
+    return new Date().format("yyyy-MM-dd-HH-mm-ss", TimeZone.getTimeZone("GMT+08:00"))
+}
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -13,8 +17,8 @@ android {
         applicationId "com.app.legend.kanfanba"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "0.1-alpha"
+        versionCode 2
+        versionName "0.2-alpha"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -23,6 +27,14 @@ android {
             zipAlignEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    android.applicationVariants.all { variant ->
+        def appName = "看番吧_${defaultConfig.versionName}_${releaseTime()}"
+
+        variant.outputs.all { output ->
+            outputFileName = "${appName}.apk"
         }
     }
 
@@ -60,6 +72,5 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.10.8'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1'
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
-    implementation 'com.sunchen:netstatusbus:0.1.5'
 
 }

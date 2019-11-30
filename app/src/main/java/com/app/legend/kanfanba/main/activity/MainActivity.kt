@@ -19,9 +19,6 @@ import com.app.legend.kanfanba.play.activity.PlayActivity
 import com.app.legend.kanfanba.search.activity.SearchActivity
 import com.app.legend.ruminasu.activityes.BasePresenterActivity
 import com.google.android.material.tabs.TabLayout
-import com.sunchen.netbus.NetStatusBus
-import com.sunchen.netbus.annotation.NetSubscribe
-import com.sunchen.netbus.type.Mode
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -45,16 +42,6 @@ class MainActivity : BasePresenterActivity<IMainActivity,MainPresenter>(),IMainA
         initPager()
 
 
-    }
-
-    override fun onStart() {
-        super.onStart()
-        NetStatusBus.getInstance().register(this);
-    }
-
-    override fun onStop() {
-        super.onStop()
-        NetStatusBus.getInstance().unregister(this);
     }
 
     /**
@@ -176,14 +163,6 @@ class MainActivity : BasePresenterActivity<IMainActivity,MainPresenter>(),IMainA
             // 退出
             super.onBackPressed();
         }
-
-    }
-    @NetSubscribe(mode = Mode.MOBILE_CONNECT)
-    public fun netChange(){
-
-//        Log.d("net--->>>","连接到移动网络")
-
-        showDialog()
 
     }
 
